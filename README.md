@@ -1,7 +1,7 @@
  # AiAgent_for_daily_attendance 
 
 project demo
-
+https://github.com/user-attachments/assets/d56e468c-8558-4668-8653-9bda24258eff
 
 📌 AI Attendance Analyzer Agent
 
