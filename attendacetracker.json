@@ -1,0 +1,199 @@
+{
+  "name": "attendacetracker",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "31ed6c85-49ff-4116-8656-7d55be65e9a4",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DoHTN7P8ysB-YkX9RNg6spdKosiuoBZGjgRDA-0wIYA",
+          "mode": "list",
+          "cachedResultName": "attendaace data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DoHTN7P8ysB-YkX9RNg6spdKosiuoBZGjgRDA-0wIYA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 735195636,
+          "mode": "list",
+          "cachedResultName": "rowdata",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DoHTN7P8ysB-YkX9RNg6spdKosiuoBZGjgRDA-0wIYA/edit#gid=735195636"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        100,
+        0
+      ],
+      "id": "0c3e59b1-f1ff-4134-8c91-c98d892ead19",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "juTINwXTHrM9GRuM",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DoHTN7P8ysB-YkX9RNg6spdKosiuoBZGjgRDA-0wIYA",
+          "mode": "list",
+          "cachedResultName": "attendaace data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DoHTN7P8ysB-YkX9RNg6spdKosiuoBZGjgRDA-0wIYA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "summary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DoHTN7P8ysB-YkX9RNg6spdKosiuoBZGjgRDA-0wIYA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "={{$json.status}}",
+            "name": "=  {{$json.name}}",
+            "date": "={{$json.date}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        660,
+        20
+      ],
+      "id": "eccf7d2b-3630-4950-a611-159eeb536d12",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "juTINwXTHrM9GRuM",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const name = item.json.name;\n  const date = item.json.date;\n  const time = item.json[\"clock in time\"];\n  let status = \"\";\n\n  if (!time || time.trim() === \"\") {\n    status = \"Absent\";\n  } else {\n    const parts = time.split(\":\");\n    const hour = parseInt(parts[0]);\n    const min = parseInt(parts[1]);\n    const isPM = time.toLowerCase().includes(\"pm\");\n\n    const totalMinutes = (isPM && hour < 12 ? hour + 12 : hour) * 60 + min;\n\n    if (totalMinutes <= 570) {\n      status = \"Present\";\n    } else {\n      status = \"Late\";\n    }\n  }\n\n  return {\n    json: {\n      name,\n      date,\n      status\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        140
+      ],
+      "id": "45abc1de-ef61-4764-8990-38f924d230bd",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        []
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "acf8f8e8-a315-4900-9b5f-d04fa19e892c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f23b5b7a28a17c9ed9310f6d7d4da32bbffc2782e71b4bec2d1271bc2cf55655"
+  },
+  "id": "13bzNXgNXqFiOBFG",
+  "tags": []
+}
