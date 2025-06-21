@@ -41,6 +41,92 @@ A Google Sheet for raw check-in data
 
 A Google Sheets API credential
 
+
+
+# AI-Powered Attendance Analyzer 
+d automatically classify each person as **Present**, **Late**, or **Absent**.
+
+No manual work needed — the bot runs every morning on its own!
+
+---
+
+## 📌 What This Project Does
+
+- Reads attendance entries (Name, Date, Clock-in Time)
+- Classifies attendance using simple rules:
+  - 🟢 Present: Clocked in by 9:30 AM
+  - 🟡 Late: Clocked in after 9:30 AM
+  - 🔴 Absent: No clock-in time
+- Saves the result into a clean summary sheet
+- Runs automatically every day via cron schedule
+
+
+
+## 🛠 Tools Used
+
+| Tool           | Purpose                                |
+|----------------|----------------------------------------|
+| [n8n](https://n8n.io)           | Visual workflow automation |
+| Google Sheets  | Data input/output                      |
+| Hugging Face (optional) | Smart AI classification         |
+| Cron Schedule  | To run the workflow daily              |
+
+---
+
+
+## 🔧 n8n Workflow Breakdown
+
+This project uses the following nodes:
+
+### 1. **Cron Node (Trigger)**  
+**Purpose:** Runs the workflow every morning.  
+**Setup:**  
+- Mode: Every Day  
+- Time: 9:00 AM  
+
+
+
+### 2. **Google Sheets (Get Rows)**  
+**Purpose:** Reads attendance from `RawData` tab  
+**Config:**  
+- Operation: Get All  
+- Sheet: Your spreadsheet  
+- Tab: RawData  
+
+
+
+### 3. **Function Node (Classify Attendance)**  
+**Purpose:** Classifies each row into Present / Late / Absent  
+**Code:**
+
+```javascript
+return items.map(item => {
+  const name = item.json.name;
+  const date = item.json.date;
+  const time = item.json["clock in time"];
+  let status = "";
+
+  if (!time) {
+    status = "Absent";
+  } else {
+    const hour = parseInt(time.split(":")[0]);
+    const min = parseInt(time.split(":")[1]);
+    const isPM = time.toLowerCase().includes("pm");
+    const totalMinutes = (isPM && hour < 12 ? hour + 12 : hour) * 60 + min;
+
+    if (totalMinutes <= 570) { // 9:30 AM = 570 mins
+      status = "Present";
+    } else {
+      status = "Late";
+    }
+  }
+
+  return {
+    json: { name, date, status }
+  };
+});
+
+
  OpenAI/Hugging Face key for LLM-based logic
 
 
