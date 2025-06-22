@@ -98,8 +98,10 @@ This project uses the following nodes:
 **Purpose:** Classifies each row into Present / Late / Absent  
 **Code:**
 
-```javascript
+javascript
+
 return items.map(item => {
+
   const name = item.json.name;
   const date = item.json.date;
   const time = item.json["clock in time"];
@@ -113,7 +115,7 @@ return items.map(item => {
     const isPM = time.toLowerCase().includes("pm");
     const totalMinutes = (isPM && hour < 12 ? hour + 12 : hour) * 60 + min;
 
-    if (totalMinutes <= 570) { // 9:30 AM = 570 mins
+    if (totalMinutes <= 570) {          // 9:30 AM = 570 mins
       status = "Present";
     } else {
       status = "Late";
@@ -126,7 +128,7 @@ return items.map(item => {
 });
 
 
- OpenAI/Hugging Face key for LLM-based logic
+ Hugging Face key for LLM-based logic
 
 
 
